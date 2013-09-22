@@ -15,7 +15,7 @@ int _tmain(int argc, _TCHAR* argv[])
 {
 	
 	CString route = "..\\input";
-	myGallery.galleryReadFromDat(route);
+	myGallery.readGallery(route);
 	return 0;
 }
 

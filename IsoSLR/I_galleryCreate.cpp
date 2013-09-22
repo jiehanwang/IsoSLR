@@ -11,6 +11,71 @@ CI_galleryCreate::~CI_galleryCreate(void)
 {
 }
 
+void CI_galleryCreate::readInPostureC(CString route, int lrb)
+{
+	FILE *filein;
+	char oneline[HOG_dimension*10];
+	int itemNumber;
+	filein = fopen(route, "rt");
+
+	readstr(filein,oneline);
+	sscanf(oneline, "NUMBER %d\n", &itemNumber);
+	classNum[lrb] = itemNumber;
+	for (int loop = 0; loop < itemNumber; loop++)
+	{
+		readstr(filein,oneline);
+		char* sp = oneline; 
+		float num; 
+		int read; 
+		int dimensionIndex = 0;
+		while( sscanf(sp, "%f %n", &num, &read)!=EOF )
+		{ 
+			postureC[lrb][loop][dimensionIndex++] = num;
+			sp += read-1; 
+		} 
+	}
+	fclose(filein);
+}
+void CI_galleryCreate::readstr(FILE *f,char *string)
+{
+	do
+	{
+		fgets(string, HOG_dimension*10, f);
+	} while ((string[0] == '/') || (string[0] == '\n'));
+	return;
+}
+void CI_galleryCreate::readstr2(FILE *f,char *string)
+{
+	do
+	{
+		fgets(string, maxClassNum*10, f);
+	} while ((string[0] == '/') || (string[0] == '\n'));
+	return;
+}
+void CI_galleryCreate::readInPostureMatrix(CString route, int lrb)
+{
+	FILE *filein;
+	char oneline[maxClassNum*10];
+	int itemNumber;
+	filein = fopen(route, "rt");
+
+	itemNumber = classNum[lrb];
+	for (int loop = 0; loop < itemNumber; loop++)
+	{
+		readstr2(filein,oneline);
+		char* sp = oneline; 
+		float num; 
+		int read; 
+		int classIndex = 0;
+		while( sscanf(sp, "%f %n", &num, &read)!=EOF )
+		{ 
+			postureMatrix[lrb][loop][classIndex++] = num;
+			sp += read-1; 
+		} 
+	}
+	fclose(filein);
+	//delete[] oneline;
+}
 
 void CI_galleryCreate::galleryReadFromDat(CString route)
 {
@@ -106,4 +171,17 @@ void CI_galleryCreate::galleryReadFromDat(CString route)
 	delete[] state_sequence;
 	delete[] transfer_sequence;
 	
+}
+
+
+void CI_galleryCreate::readGallery(CString route)
+{
+	readInPostureC(route + "\\postureC_0.txt",0); //Left posture
+	readInPostureC(route + "\\postureC_1.txt",1); //Right posture
+	readInPostureC(route + "\\postureC_2.txt",2); //Both posture
+	readInPostureMatrix(route + "\\postureMatrix_0.txt",0);
+	readInPostureMatrix(route + "\\postureMatrix_1.txt",1);
+	readInPostureMatrix(route + "\\postureMatrix_2.txt",2);
+
+	galleryReadFromDat(route);
 }
