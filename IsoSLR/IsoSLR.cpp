@@ -105,12 +105,13 @@ int _tmain(int argc, _TCHAR* argv[])
 
 				//Compute its feature.																						 
 				myProbe.featureCalPosture();
+				myProbe.postureClassification(myGallery.classNum, myGallery.postureC);
 				tempState.l = tempSegment.LeftLabel;
 				tempState.r = tempSegment.RightLabel;
 				tempState.b = tempSegment.BothLabel;
-// 				tempState.L = 
-// 				tempState.R = 
-// 				tempState.B = 
+				tempState.L = myProbe.leftClass;
+				tempState.R = myProbe.rightClass;
+				tempState.B = myProbe.bothClass;
 // 				tempState.PL = 
 // 				tempState.PR = 
 // 				tempState.TL = 
@@ -125,7 +126,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	for (int i=0; i<myState.size(); i++)
 	{
-		cout<<myState[i].l<<" "<<myState[i].r<<" "<<myState[i].b<<endl;
+		cout<<myState[i].l<<" "<<myState[i].r<<" "<<myState[i].b<<" "<<myState[i].L<<" "<<myState[i].R<<" "<<myState[i].B<<endl;
 	}
 
 	myKeyframe.setGetDataOver(true);

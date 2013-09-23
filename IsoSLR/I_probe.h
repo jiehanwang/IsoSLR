@@ -1,6 +1,9 @@
 #pragma once
 #include "S_Feature.h"
 #include "globalDefine.h"
+#include <string>
+#include <atlstr.h>
+#include <direct.h>
 struct Std
 {
 	IplImage * pic_route;//Pointer to the key frame sequence.
@@ -16,6 +19,9 @@ public:
 	IplImage*      keyFrames;             //The best key frame.
 	S_CFeature     P_myFeature;          //The object of CFeature class.
 	vector<Std>    choose_pic;           //Store the best picture.
+	int leftClass;
+	int rightClass;
+	int bothClass;
 
 	IplImage* leftImage;
 	IplImage* rightImage;
@@ -33,5 +39,7 @@ public:
 	IplImage* Resize(IplImage* _img);
 	bool cmp(Std pp, Std qq);
 	int bestFrame(vector<Std> choose_pic);
+	void postureClassification(int classNum[], float postureC[][maxClassNum][HOG_dimension]);
+	void saveFrames(int folderIndex, IplImage* image, int lrb, int frameIndexStart, int frameIndexEnd);
 };
 

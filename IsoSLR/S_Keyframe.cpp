@@ -2311,30 +2311,30 @@ void S_Keyframe::saveHandImage(IplImage* handImage, int frameID, HANDTYPE hType,
 IplImage* S_Keyframe::getConnextImage(IplImage* grayImage,IplImage* binaryImage,int* theBox,int connIdx,int frameID)
 {
 	CvRect ConnexeRect = cvRect(theBox[0],theBox[1],theBox[2]-theBox[0],theBox[3]-theBox[1]);
-	cvSetImageROI(vColorData[frameID%bufferSize],ConnexeRect);
-	IplImage* colorOutput=cvCreateImage(cvSize(ConnexeRect.width,ConnexeRect.height),vColorData[frameID%bufferSize]->depth,vColorData[frameID%bufferSize]->nChannels);
-	cvCopy(vColorData[frameID%bufferSize],colorOutput);
-	cvResetImageROI(vColorData[frameID%bufferSize]);
-	cvCvtColor(colorOutput,colorOutput,CV_BGR2HSV);
-	IplImage* equalizeImageH=cvCreateImage(cvSize(ConnexeRect.width,ConnexeRect.height),vColorData[frameID%bufferSize]->depth,1);
-	IplImage* equalizeImageS=cvCreateImage(cvSize(ConnexeRect.width,ConnexeRect.height),vColorData[frameID%bufferSize]->depth,1);
-	IplImage* equalizeImageV=cvCreateImage(cvSize(ConnexeRect.width,ConnexeRect.height),vColorData[frameID%bufferSize]->depth,1);
-	cvSplit(colorOutput,equalizeImageH,equalizeImageS,equalizeImageV,NULL);
-	cvEqualizeHist(equalizeImageV,equalizeImageV);
-	cvMerge(equalizeImageH,equalizeImageS,equalizeImageV,NULL,colorOutput);
-	//cvSetImageROI(grayImage,ConnexeRect);
+// 	cvSetImageROI(vColorData[frameID%bufferSize],ConnexeRect);
+// 	IplImage* colorOutput=cvCreateImage(cvSize(ConnexeRect.width,ConnexeRect.height),vColorData[frameID%bufferSize]->depth,vColorData[frameID%bufferSize]->nChannels);
+// 	cvCopy(vColorData[frameID%bufferSize],colorOutput);
+// 	cvResetImageROI(vColorData[frameID%bufferSize]);
+// 	cvCvtColor(colorOutput,colorOutput,CV_BGR2HSV);
+// 	IplImage* equalizeImageH=cvCreateImage(cvSize(ConnexeRect.width,ConnexeRect.height),vColorData[frameID%bufferSize]->depth,1);
+// 	IplImage* equalizeImageS=cvCreateImage(cvSize(ConnexeRect.width,ConnexeRect.height),vColorData[frameID%bufferSize]->depth,1);
+// 	IplImage* equalizeImageV=cvCreateImage(cvSize(ConnexeRect.width,ConnexeRect.height),vColorData[frameID%bufferSize]->depth,1);
+// 	cvSplit(colorOutput,equalizeImageH,equalizeImageS,equalizeImageV,NULL);
+// 	cvEqualizeHist(equalizeImageV,equalizeImageV);
+// 	cvMerge(equalizeImageH,equalizeImageS,equalizeImageV,NULL,colorOutput);
+	cvSetImageROI(grayImage,ConnexeRect);
 	IplImage* outputImage = cvCreateImage(cvSize(ConnexeRect.width,ConnexeRect.height),grayImage->depth,grayImage->nChannels);
 //	IplImage* resizeImage = cvCreateImage(cvSize(64,64),grayImage->depth,grayImage->nChannels);
-	//cvCopy(grayImage,outputImage);
-	//cvResetImageROI(grayImage);
-	cvCvtColor(colorOutput,colorOutput,CV_HSV2BGR);
-	cvCvtColor(colorOutput,outputImage,CV_RGB2GRAY);
-	cvReleaseImage(&colorOutput);
-	cvReleaseImage(&equalizeImageH);
-	cvReleaseImage(&equalizeImageS);
-	cvReleaseImage(&equalizeImageV);
+	cvCopy(grayImage,outputImage);
+	cvResetImageROI(grayImage);
+// 	cvCvtColor(colorOutput,colorOutput,CV_HSV2BGR);
+// 	cvCvtColor(colorOutput,outputImage,CV_RGB2GRAY);
+// 	cvReleaseImage(&colorOutput);
+// 	cvReleaseImage(&equalizeImageH);
+// 	cvReleaseImage(&equalizeImageS);
+// 	cvReleaseImage(&equalizeImageV);
 
-	if (useSegW == 1)
+//	if (useSegW == 1)
 	{
 		for(int i=0;i<outputImage->height;i++)
 		{
@@ -3115,11 +3115,11 @@ KeyFrameSegment S_Keyframe::getFragment()
 
 bool S_Keyframe::isSameFragment(KeyFrameSegment Fragment1,KeyFrameSegment Fragment2,int index)
 {
-	IplImage * ori_img=cvCreateImage( cvSize(SIZE,SIZE),8,1);;//原始图像
-	IplImage * avg_img=cvCreateImage( cvSize(SIZE,SIZE),8,1);//均值图像
+	IplImage * ori_img=cvCreateImage( cvSize(SIZEs,SIZEs),8,1);;//原始图像
+	IplImage * avg_img=cvCreateImage( cvSize(SIZEs,SIZEs),8,1);//均值图像
 	uchar *pp;
 	uchar *qq;
-	int Img_sum[SIZE][SIZE];//用于图像求和
+	int Img_sum[SIZEs][SIZEs];//用于图像求和
 	memset( Img_sum,0,sizeof(Img_sum) );//先清零
 	int k;
 	int m,n;
@@ -3130,19 +3130,19 @@ bool S_Keyframe::isSameFragment(KeyFrameSegment Fragment1,KeyFrameSegment Fragme
 		for(k=0;k<Fragment1.RightNum;k++)
 		{
 			cvResize(Fragment1.RightImages[k],ori_img);
-			for(m=0;m<SIZE;m++)
+			for(m=0;m<SIZEs;m++)
 			{
 				pp=(uchar *)(ori_img->imageData+m*ori_img->widthStep);
-				for(n=0;n<SIZE;n++)
+				for(n=0;n<SIZEs;n++)
 				{
 					Img_sum[m][n]+=pp[n*ori_img->nChannels];
 				}
 			}
 		}
-		for(m=0;m<SIZE;m++)
+		for(m=0;m<SIZEs;m++)
 		{
 			qq=(uchar *)(avg_img->imageData+m*avg_img->widthStep);
-			for(n=0;n<SIZE;n++)
+			for(n=0;n<SIZEs;n++)
 			{
 				Img_sum[m][n]=Img_sum[m][n]/Fragment1.RightNum;
 				qq[n*avg_img->nChannels]=Img_sum[m][n];
@@ -3165,19 +3165,19 @@ bool S_Keyframe::isSameFragment(KeyFrameSegment Fragment1,KeyFrameSegment Fragme
 		for(k=0;k<Fragment2.RightNum;k++)
 		{
 			cvResize(Fragment2.RightImages[k],ori_img);
-			for(m=0;m<SIZE;m++)
+			for(m=0;m<SIZEs;m++)
 			{
 				pp=(uchar *)(ori_img->imageData+m*ori_img->widthStep);
-				for(n=0;n<SIZE;n++)
+				for(n=0;n<SIZEs;n++)
 				{
 					Img_sum[m][n]+=pp[n*ori_img->nChannels];
 				}
 			}
 		}
-		for(m=0;m<SIZE;m++)
+		for(m=0;m<SIZEs;m++)
 		{
 			qq=(uchar *)(avg_img->imageData+m*avg_img->widthStep);
-			for(n=0;n<SIZE;n++)
+			for(n=0;n<SIZEs;n++)
 			{
 				Img_sum[m][n]=Img_sum[m][n]/Fragment2.RightNum;
 				qq[n*avg_img->nChannels]=Img_sum[m][n];
@@ -3220,19 +3220,19 @@ bool S_Keyframe::isSameFragment(KeyFrameSegment Fragment1,KeyFrameSegment Fragme
 		for(k=0;k<Fragment1.LeftNum;k++)
 		{
 			cvResize(Fragment1.LeftImages[k],ori_img);
-			for(m=0;m<SIZE;m++)
+			for(m=0;m<SIZEs;m++)
 			{
 				pp=(uchar *)(ori_img->imageData+m*ori_img->widthStep);
-				for(n=0;n<SIZE;n++)
+				for(n=0;n<SIZEs;n++)
 				{
 					Img_sum[m][n]+=pp[n*ori_img->nChannels];
 				}
 			}
 		}
-		for(m=0;m<SIZE;m++)
+		for(m=0;m<SIZEs;m++)
 		{
 			qq=(uchar *)(avg_img->imageData+m*avg_img->widthStep);
-			for(n=0;n<SIZE;n++)
+			for(n=0;n<SIZEs;n++)
 			{
 				Img_sum[m][n]=Img_sum[m][n]/Fragment1.LeftNum;
 				qq[n*avg_img->nChannels]=Img_sum[m][n];
@@ -3255,19 +3255,19 @@ bool S_Keyframe::isSameFragment(KeyFrameSegment Fragment1,KeyFrameSegment Fragme
 		for(k=0;k<Fragment2.LeftNum;k++)
 		{
 			cvResize(Fragment2.LeftImages[k],ori_img);
-			for(m=0;m<SIZE;m++)
+			for(m=0;m<SIZEs;m++)
 			{
 				pp=(uchar *)(ori_img->imageData+m*ori_img->widthStep);
-				for(n=0;n<SIZE;n++)
+				for(n=0;n<SIZEs;n++)
 				{
 					Img_sum[m][n]+=pp[n*ori_img->nChannels];
 				}
 			}
 		}
-		for(m=0;m<SIZE;m++)
+		for(m=0;m<SIZEs;m++)
 		{
 			qq=(uchar *)(avg_img->imageData+m*avg_img->widthStep);
-			for(n=0;n<SIZE;n++)
+			for(n=0;n<SIZEs;n++)
 			{
 				Img_sum[m][n]=Img_sum[m][n]/Fragment2.LeftNum;
 				qq[n*avg_img->nChannels]=Img_sum[m][n];
@@ -3310,19 +3310,19 @@ bool S_Keyframe::isSameFragment(KeyFrameSegment Fragment1,KeyFrameSegment Fragme
 		for(k=0;k<Fragment1.BothNum;k++)
 		{
 			cvResize(Fragment1.BothImages[k],ori_img);
-			for(m=0;m<SIZE;m++)
+			for(m=0;m<SIZEs;m++)
 			{
 				pp=(uchar *)(ori_img->imageData+m*ori_img->widthStep);
-				for(n=0;n<SIZE;n++)
+				for(n=0;n<SIZEs;n++)
 				{
 					Img_sum[m][n]+=pp[n*ori_img->nChannels];
 				}
 			}
 		}
-		for(m=0;m<SIZE;m++)
+		for(m=0;m<SIZEs;m++)
 		{
 			qq=(uchar *)(avg_img->imageData+m*avg_img->widthStep);
-			for(n=0;n<SIZE;n++)
+			for(n=0;n<SIZEs;n++)
 			{
 				Img_sum[m][n]=Img_sum[m][n]/Fragment1.BothNum;
 				qq[n*avg_img->nChannels]=Img_sum[m][n];
@@ -3345,19 +3345,19 @@ bool S_Keyframe::isSameFragment(KeyFrameSegment Fragment1,KeyFrameSegment Fragme
 		for(k=0;k<Fragment2.BothNum;k++)
 		{
 			cvResize(Fragment2.BothImages[k],ori_img);
-			for(m=0;m<SIZE;m++)
+			for(m=0;m<SIZEs;m++)
 			{
 				pp=(uchar *)(ori_img->imageData+m*ori_img->widthStep);
-				for(n=0;n<SIZE;n++)
+				for(n=0;n<SIZEs;n++)
 				{
 					Img_sum[m][n]+=pp[n*ori_img->nChannels];
 				}
 			}
 		}
-		for(m=0;m<SIZE;m++)
+		for(m=0;m<SIZEs;m++)
 		{
 			qq=(uchar *)(avg_img->imageData+m*avg_img->widthStep);
-			for(n=0;n<SIZE;n++)
+			for(n=0;n<SIZEs;n++)
 			{
 				Img_sum[m][n]=Img_sum[m][n]/Fragment2.BothNum;
 				qq[n*avg_img->nChannels]=Img_sum[m][n];

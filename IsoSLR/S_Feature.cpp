@@ -20,9 +20,9 @@ bool S_CFeature::GetHOGHistogram_Patch(IplImage* img, double hog_hist[])
 	}
 	else
 	{
-		//HOGDescriptor *hog=new HOGDescriptor(cvSize(SIZE,SIZE),cvSize(16,16),cvSize(8,8),cvSize(8,8),9);
-		//(cvSize(SIZE,SIZE),cvSize(16,16),cvSize(8,8),cvSize(8,8),9)
-		HOGDescriptor *hog=new HOGDescriptor(cvSize(SIZE,SIZE),cvSize(32,32),cvSize(16,16),cvSize(16,16),9); //dimension 324
+		//HOGDescriptor *hog=new HOGDescriptor(cvSize(SIZEs,SIZEs),cvSize(16,16),cvSize(8,8),cvSize(8,8),9);
+		//(cvSize(SIZEs,SIZEs),cvSize(16,16),cvSize(8,8),cvSize(8,8),9)
+		HOGDescriptor *hog=new HOGDescriptor(cvSize(SIZEs,SIZEs),cvSize(32,32),cvSize(16,16),cvSize(16,16),9); //dimension 324
 		/////////////////////window: 64*64£¬block: 8*8£¬block step:4*4£¬cell: 4*4
 		cvNormalize(img,img,255,0,CV_MINMAX,0); //Add by Hanjie Wang. 2013-03.
 		//LBP(img,img);

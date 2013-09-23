@@ -4,7 +4,7 @@
 
 CI_probe::CI_probe(void)
 {
-	keyFrames = cvCreateImage(cvSize(SIZE,SIZE),8,1);
+	keyFrames = cvCreateImage(cvSize(SIZEs,SIZEs),8,1);
 	keyFeatureStreamArr = new double[HOG_dimension];
 }
 
@@ -29,20 +29,20 @@ void CI_probe::keyFrameSelect(IplImage** rightKeyFrames, IplImage** leftKeyFrame
 	bothImage = keyFrameSelect_sub(bothKeyFrames,bothKeyNum);
 
 
-	IplImage* LRImage = cvCreateImage(cvSize(SIZE*2,SIZE),8,1);
+	IplImage* LRImage = cvCreateImage(cvSize(SIZEs*2,SIZEs),8,1);
 	if (leftImage == NULL && rightImage!=NULL)
 	{
-		for (m=0;m<SIZE;m++)
+		for (m=0;m<SIZEs;m++)
 		{ 
 			uchar* src_right = (uchar*)(rightImage->imageData + m*rightImage->widthStep);
 			uchar* src_LR = (uchar*)(LRImage->imageData + m*LRImage->widthStep);
-			for (n=0;n<SIZE;n++)
+			for (n=0;n<SIZEs;n++)
 			{
 				src_LR[n] = 0;
 			}
-			for (n=SIZE;n<2*SIZE;n++)
+			for (n=SIZEs;n<2*SIZEs;n++)
 			{
-				src_LR[n] = src_right[n-SIZE];
+				src_LR[n] = src_right[n-SIZEs];
 			}
 
 		}
@@ -51,15 +51,15 @@ void CI_probe::keyFrameSelect(IplImage** rightKeyFrames, IplImage** leftKeyFrame
 	}
 	else if (leftImage != NULL && rightImage==NULL)
 	{
-		for (m=0;m<SIZE;m++)
+		for (m=0;m<SIZEs;m++)
 		{ 
 			uchar* src_left = (uchar*)(leftImage->imageData + m*leftImage->widthStep);
 			uchar* src_LR = (uchar*)(LRImage->imageData + m*LRImage->widthStep);
-			for (n=0;n<SIZE;n++)
+			for (n=0;n<SIZEs;n++)
 			{
 				src_LR[n] = src_left[n];
 			}
-			for (n=SIZE;n<2*SIZE;n++)
+			for (n=SIZEs;n<2*SIZEs;n++)
 			{
 				src_LR[n] = 0;
 			}
@@ -70,18 +70,18 @@ void CI_probe::keyFrameSelect(IplImage** rightKeyFrames, IplImage** leftKeyFrame
 	}
 	else if (leftImage != NULL && rightImage!=NULL)
 	{
-		for (m=0;m<SIZE;m++)
+		for (m=0;m<SIZEs;m++)
 		{ 
 			uchar* src_left = (uchar*)(leftImage->imageData + m*leftImage->widthStep);
 			uchar* src_right = (uchar*)(rightImage->imageData + m*rightImage->widthStep);
 			uchar* src_LR = (uchar*)(LRImage->imageData + m*LRImage->widthStep);
-			for (n=0;n<SIZE;n++)
+			for (n=0;n<SIZEs;n++)
 			{
 				src_LR[n] = src_left[n];
 			}
-			for (n=SIZE;n<2*SIZE;n++)
+			for (n=SIZEs;n<2*SIZEs;n++)
 			{
-				src_LR[n] = src_right[n-SIZE];
+				src_LR[n] = src_right[n-SIZEs];
 			}
 
 		}
@@ -98,7 +98,7 @@ void CI_probe::keyFrameSelect(IplImage** rightKeyFrames, IplImage** leftKeyFrame
 	//#ifdef saveFiles
 // 	if (saveFiles_va == 1)
 // 	{
-// 		saveFrames(folderIndex,keyFrames,0,frameIndexStart, frameIndexEnd);
+ 		saveFrames(folderIndex,keyFrames,0,frameIndexStart, frameIndexEnd);
 // 	}
 	//#endif
 
@@ -150,7 +150,7 @@ double CI_probe::img_distance(IplImage* dst1, IplImage* dst2)
 
 IplImage* CI_probe::Resize(IplImage* _img)    //Memory leak?
 {
-	IplImage *_dst=cvCreateImage(cvSize(SIZE,SIZE),_img->depth,_img->nChannels);
+	IplImage *_dst=cvCreateImage(cvSize(SIZEs,SIZEs),_img->depth,_img->nChannels);
 	cvResize(_img,_dst);
 	return _dst;
 }
@@ -191,7 +191,7 @@ IplImage* CI_probe::keyFrameSelect_sub(IplImage** KeyFrames, int KeyNum)
 	uchar *pp;
 	uchar *qq;
 	Std   p_std;
-	IplImage *T_avg=cvCreateImage(cvSize(SIZE,SIZE),8,1);//Mean images
+	IplImage *T_avg=cvCreateImage(cvSize(SIZEs,SIZEs),8,1);//Mean images
 
 	memset(Sum,0,sizeof(Sum));
 	for (i=0; i<KeyNum; i++)
@@ -212,10 +212,10 @@ IplImage* CI_probe::keyFrameSelect_sub(IplImage** KeyFrames, int KeyNum)
 
 	if(choose_pic.size() > 0)
 	{
-		for(m=0;m<SIZE;m++)
+		for(m=0;m<SIZEs;m++)
 		{
 			qq=(uchar *)(T_avg->imageData+m*T_avg->widthStep);
-			for(n=0;n<SIZE;n++)
+			for(n=0;n<SIZEs;n++)
 			{
 				Sum[m][n]=Sum[m][n]/choose_pic.size();
 				qq[n*T_avg->nChannels]=Sum[m][n];
@@ -235,4 +235,106 @@ IplImage* CI_probe::keyFrameSelect_sub(IplImage** KeyFrames, int KeyNum)
 		return NULL;
 	}
 
+}
+
+void CI_probe::postureClassification(int classNum[], float postureC[][maxClassNum][HOG_dimension])
+{
+	double *tempFeature = new double[HOG_dimension];;
+	double minDis;
+	int minLabel;
+	//////////////////////////////////////////////////////////////////////////
+	//Left hand
+	memset(tempFeature, 0, sizeof(double)*HOG_dimension);
+	if (leftImage!=NULL)
+	{
+		P_myFeature.GetHOGHistogram_Patch(leftImage,tempFeature);
+		minDis = 10000;
+		minLabel = 0;
+		for (int i=0; i<classNum[0]; i++)
+		{
+			double sumD = 0;
+			for (int h=0; h<HOG_dimension; h++)
+			{
+				sumD += pow((tempFeature[h] - postureC[0][i][h]),2);
+			}
+			if (sumD < minDis)
+			{
+				minDis = sumD;
+				minLabel = i;
+			}
+		}
+		leftClass = minLabel;
+	}
+	else
+	{
+		leftClass = -1;
+	}
+	
+	//////////////////////////////////////////////////////////////////////////
+	//Right hand
+	memset(tempFeature, 0, sizeof(double)*HOG_dimension);
+	if (rightImage!=NULL)
+	{
+		P_myFeature.GetHOGHistogram_Patch(rightImage,tempFeature);
+		minDis = 10000;
+		minLabel = 0;
+		for (int i=0; i<classNum[1]; i++)
+		{
+			double sumD = 0;
+			for (int h=0; h<HOG_dimension; h++)
+			{
+				sumD += pow((tempFeature[h] - postureC[1][i][h]),2);
+			}
+			if (sumD < minDis)
+			{
+				minDis = sumD;
+				minLabel = i;
+			}
+		}
+		rightClass = minLabel;
+	}
+	else
+	{
+		rightClass = -1;
+	}
+	
+	//////////////////////////////////////////////////////////////////////////
+	memset(tempFeature, 0, sizeof(double)*HOG_dimension);
+	if (bothImage!=NULL)
+	{
+		P_myFeature.GetHOGHistogram_Patch(bothImage,tempFeature);
+		minDis = 10000;
+		minLabel = 0;
+		for (int i=0; i<classNum[2]; i++)
+		{
+			double sumD = 0;
+			for (int h=0; h<HOG_dimension; h++)
+			{
+				sumD += pow((tempFeature[h] - postureC[2][i][h]),2);
+			}
+			if (sumD < minDis)
+			{
+				minDis = sumD;
+				minLabel = i;
+			}
+		}
+		bothClass = minLabel;
+	}
+	else
+	{
+		bothClass = -1;
+	}
+	
+	delete[] tempFeature;
+}
+void CI_probe::saveFrames(int folderIndex, IplImage* image, int lrb, int frameIndexStart, int frameIndexEnd)
+{
+	int i,j,k;
+	CString s_filefolder;
+	s_filefolder.Format("..\\output\\%d",folderIndex);
+	_mkdir(s_filefolder);
+	CString s_ImgFileName;
+	s_ImgFileName.Format("..\\output\\%d\\LRB_%d_%d.jpg",folderIndex,frameIndexStart, frameIndexEnd);
+
+	cvSaveImage(s_ImgFileName, image);
 }

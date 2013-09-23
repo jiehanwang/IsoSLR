@@ -11,7 +11,7 @@ using namespace cv;
 
 class CI_galleryCreate
 {
-private:
+public:
 	int            classNum[LRB];  //The class number of left, right, both postures. 
 	float          postureC[LRB][maxClassNum][HOG_dimension];
 	float          postureMatrix[LRB][maxClassNum][maxClassNum];

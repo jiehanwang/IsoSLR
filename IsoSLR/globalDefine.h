@@ -203,4 +203,4 @@ struct KeyFrameUnit
 
 typedef multimap<double, int, greater<double> > RecogValueIDPair;
 
-#define SIZE 64
+#define SIZEs 64
