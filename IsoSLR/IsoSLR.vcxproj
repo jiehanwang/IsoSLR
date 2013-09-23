@@ -77,18 +77,33 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="connexe.h" />
     <ClInclude Include="globalDefine.h" />
     <ClInclude Include="I_galleryCreate.h" />
+    <ClInclude Include="I_probe.h" />
+    <ClInclude Include="Readvideo.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="S_Feature.h" />
+    <ClInclude Include="S_Keyframe.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="typedefs.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="connexe.cpp" />
     <ClCompile Include="IsoSLR.cpp" />
     <ClCompile Include="I_galleryCreate.cpp" />
+    <ClCompile Include="I_probe.cpp" />
+    <ClCompile Include="Readvideo.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="S_Feature.cpp" />
+    <ClCompile Include="S_Keyframe.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="IsoSLR.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

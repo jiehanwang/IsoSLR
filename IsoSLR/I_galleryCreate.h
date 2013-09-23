@@ -8,22 +8,7 @@
 using namespace std;
 using namespace cv;
 
-struct State
-{
-	int r;             //Indicator
-	int l;
-	int b;
-	int R;             //Hand posture label
-	int L;
-	int B;
-	CvPoint3D32f PL;   //Hand position
-	CvPoint3D32f PR;  
-	int TL;            //Hand trajectory label
-	int TR;
-	double frequency;  //Frequency of this state in the combined gallery.
-	// 	int previous;      //-1 is the start.
-	// 	int next;          //-2 is the end. 
-};
+
 class CI_galleryCreate
 {
 private:
