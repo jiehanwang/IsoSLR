@@ -2123,7 +2123,7 @@ IplImage* S_Keyframe::getConnextImage(IplImage* binaryImage,int* theBox,int conn
 	cvReleaseImage(&equalizeImageS);
 	cvReleaseImage(&equalizeImageV);
 
-	if (useSegW == 1)
+//	if (useSegW == 1)
 	{
 		for(int i=0;i<outputImage->height;i++)
 		{
