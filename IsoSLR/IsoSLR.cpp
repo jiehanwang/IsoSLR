@@ -2,20 +2,22 @@
 //
 
 #include "stdafx.h"
-#include<iostream>
-#include<fstream>
+#include <iostream>
+#include <fstream>
 #include <opencv2\opencv.hpp>
 #include <vector>
 #include "I_galleryCreate.h"
 #include "Readvideo.h"
 #include "S_Keyframe.h"
 #include "I_probe.h"
+#include "I_match.h"
 using namespace std;
 using namespace cv;
 
 CI_galleryCreate myGallery;
 S_Keyframe       myKeyframe;
 CI_probe         myProbe;
+CI_match         myMatch;
 
 struct RECVPARAM
 {
@@ -32,30 +34,32 @@ int _tmain(int argc, _TCHAR* argv[])
 	CvPoint3D32f    headPoint;
 	vector<State>   myState;
 
+
 	CString route = "..\\input";
 	myGallery.readGallery(route);
+
+	
 
 	Readvideo myReadVideo;
 	int sentenceIndex = 50;
 	CString         videoFileName;
 	if (sentenceIndex<10)
 	{
-		videoFileName.Format("D:\\iData\\p08_01\\S08_000%d_1_0_20130412.oni",sentenceIndex);
+		videoFileName.Format("D:\\iData\\isolatedWord\\P50\\P50_000%d_1_0_20121002.oni",sentenceIndex);
 	}
 	else if (sentenceIndex<100)
 	{
-		videoFileName.Format("D:\\iData\\p08_01\\S08_00%d_1_0_20130412.oni",sentenceIndex);
+		videoFileName.Format("D:\\iData\\isolatedWord\\P50\\P50_00%d_1_0_20121002.oni",sentenceIndex);
 	}
-	else if (sentenceIndex<226)
+	else if (sentenceIndex<239)
 	{
-		videoFileName.Format("D:\\iData\\p08_01\\S08_0%d_1_0_20130412.oni",sentenceIndex);
+		videoFileName.Format("D:\\iData\\isolatedWord\\P50\\P50_0%d_1_0_20121002.oni",sentenceIndex);
 	}
 	else if (sentenceIndex<1000)
 	{
-		//videoFileName.Format("D:\\iData\\p08_01\\S08_0%d_1_0_20130919.oni",sentenceIndex);
-		videoFileName.Format("D:\\iData\\ydd-s\\S05_0%d_5_0_20130919.oni",sentenceIndex);
-
+		videoFileName.Format("D:\\iData\\isolatedWord\\P50\\P50_0%d_1_0_20121208.oni",sentenceIndex);
 	}
+
 
 	string  s   =   (LPCTSTR)videoFileName;
 	myReadVideo.readvideo(s);
@@ -129,6 +133,9 @@ int _tmain(int argc, _TCHAR* argv[])
 		cout<<myState[i].l<<" "<<myState[i].r<<" "<<myState[i].b<<" "<<myState[i].L<<" "<<myState[i].R<<" "<<myState[i].B<<endl;
 	}
 
+	int classNo = myMatch.run(myGallery.keyFrameNo, myGallery.myState, myGallery.tranfer,
+		myGallery.postureMatrix, myState);
+	 
 	myKeyframe.setGetDataOver(true);
 	while(!myKeyframe.getSegmentOver());
 	myKeyframe.releaseMemory();

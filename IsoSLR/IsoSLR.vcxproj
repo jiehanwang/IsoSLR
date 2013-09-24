@@ -80,6 +80,7 @@
     <ClInclude Include="connexe.h" />
     <ClInclude Include="globalDefine.h" />
     <ClInclude Include="I_galleryCreate.h" />
+    <ClInclude Include="I_match.h" />
     <ClInclude Include="I_probe.h" />
     <ClInclude Include="Readvideo.h" />
     <ClInclude Include="resource.h" />
@@ -93,6 +94,7 @@
     <ClCompile Include="connexe.cpp" />
     <ClCompile Include="IsoSLR.cpp" />
     <ClCompile Include="I_galleryCreate.cpp" />
+    <ClCompile Include="I_match.cpp" />
     <ClCompile Include="I_probe.cpp" />
     <ClCompile Include="Readvideo.cpp" />
     <ClCompile Include="stdafx.cpp">
