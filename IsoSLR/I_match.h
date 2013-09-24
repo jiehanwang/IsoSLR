@@ -12,5 +12,6 @@ public:
 		double galleryTranfer[][MaxCombine+2][MaxCombine+2],
 		float postureMatrix[][maxClassNum][maxClassNum],
 		vector<State> probeState);
+	double maxSimilar(CvPoint p0, CvPoint p1, double** likeli);
 };
 

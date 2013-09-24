@@ -41,7 +41,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	
 
 	Readvideo myReadVideo;
-	int sentenceIndex = 50;
+	int sentenceIndex = 3;
 	CString         videoFileName;
 	if (sentenceIndex<10)
 	{
