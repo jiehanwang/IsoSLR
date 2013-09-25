@@ -34,13 +34,27 @@ int _tmain(int argc, _TCHAR* argv[])
 	CvPoint3D32f    headPoint;
 	vector<State>   myState;
 
-
+	//Read in the gallery.
 	CString route = "..\\input";
 	myGallery.readGallery(route);
 
+	//Read in the Probe.
+	myProbe.ReadDataFromGallery(route);
+	myProbe.generateProbeStateFromDat(myGallery.classNum, myGallery.postureC);
 	
+	for (int i=0; i<myProbe.ikeyFrameNo[0][0]; i++)
+	{
+		State stateTemp = myProbe.myState[0][0][i];
+		myState.push_back(stateTemp);
+	}
 
-	Readvideo myReadVideo;
+	int classNo = myMatch.run(myGallery.keyFrameNo, myGallery.myState, myGallery.tranfer,
+		myGallery.postureMatrix, myState);
+
+	cout<<"ClassNo: "<<classNo<<endl;
+
+//It is the code generate state from videos.
+/*	Readvideo myReadVideo;
 	int sentenceIndex = 3;
 	CString         videoFileName;
 	if (sentenceIndex<10)
@@ -133,14 +147,16 @@ int _tmain(int argc, _TCHAR* argv[])
 		cout<<myState[i].l<<" "<<myState[i].r<<" "<<myState[i].b<<" "<<myState[i].L<<" "<<myState[i].R<<" "<<myState[i].B<<endl;
 	}
 
-	int classNo = myMatch.run(myGallery.keyFrameNo, myGallery.myState, myGallery.tranfer,
-		myGallery.postureMatrix, myState);
+// 	int classNo = myMatch.run(myGallery.keyFrameNo, myGallery.myState, myGallery.tranfer,
+// 		myGallery.postureMatrix, myState);
 	 
 	myKeyframe.setGetDataOver(true);
 	while(!myKeyframe.getSegmentOver());
 	myKeyframe.releaseMemory();
 	
 	cvReleaseImage(&frameCurrent);
+
+*/
 	cout<<"done"<<endl;
 	getchar();
 	return 0;
