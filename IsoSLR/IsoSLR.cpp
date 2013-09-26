@@ -42,16 +42,37 @@ int _tmain(int argc, _TCHAR* argv[])
 	myProbe.ReadDataFromGallery(route);
 	myProbe.generateProbeStateFromDat(myGallery.classNum, myGallery.postureC);
 	
-	for (int i=0; i<myProbe.ikeyFrameNo[0][0]; i++)
+	int correctSum = 0;
+	//float correctP = 0.0;
+	for (int w=0; w<Word_num; w++)
+	//int w=117;
 	{
-		State stateTemp = myProbe.myState[0][0][i];
-		myState.push_back(stateTemp);
+		if (myProbe.ikeyFrameNo[0][w] > 0)
+		{
+			for (int i=0; i<myProbe.ikeyFrameNo[0][w]; i++)
+			{
+				State stateTemp = myProbe.myState[0][w][i];
+				myState.push_back(stateTemp);
+			}
+
+			int classNo = myMatch.run(myGallery.keyFrameNo, myGallery.myState, myGallery.tranfer,
+				myGallery.postureMatrix, myState);
+
+			cout<<"WordID: "<<w<<" ClassNo: "<<classNo<<endl;
+			if (w == classNo)
+			{
+				correctSum += 1;
+			}
+		}
+		else
+		{
+			cout<<"No probe!"<<endl;
+		}
+		
+		
+		myState.clear();
 	}
-
-	int classNo = myMatch.run(myGallery.keyFrameNo, myGallery.myState, myGallery.tranfer,
-		myGallery.postureMatrix, myState);
-
-	cout<<"ClassNo: "<<classNo<<endl;
+	cout<<"correct rate: "<<(float)correctSum/Word_num<<endl;
 
 //It is the code generate state from videos.
 /*	Readvideo myReadVideo;

@@ -67,10 +67,8 @@ int CI_match::run(int galleryKeyFrameNo[], State galleryState[][MaxCombine],
 	for (int w=0; w<Word_num; w++)
 	{
 		wordScore[w] = 0;
-		//cout<<"word"<<w<<endl;
 		int keyNo_G = galleryKeyFrameNo[w];
 		vector<int> myStack;
-		vector<int> maxPro;//Sum all the probabilities rather than choose he max one.
 		myStack.push_back(0);
 		
 		int* posi = new int[keyNo_G+2];
@@ -78,7 +76,6 @@ int CI_match::run(int galleryKeyFrameNo[], State galleryState[][MaxCombine],
 		{
 			posi[k] = k;
 		}
-		//currentP.push_back(-1);
 		while (myStack.size()>0)
 		{
 			int TopV = myStack[myStack.size()-1];
@@ -90,14 +87,14 @@ int CI_match::run(int galleryKeyFrameNo[], State galleryState[][MaxCombine],
 					int tempSe = -1;
 					if (k == keyNo_G+1)
 					{
+						//////////////////////////////////////////////////////////////////////////
+						int keyNo_G_ = myStack.size()-2;
 // 						for (int l=0; l<myStack.size(); l++)
 // 						{
-// 							//compute the maxPro;
 // 							cout<<myStack[l]<<'\t';
 // 						}
 // 						cout<<endl;
-						//////////////////////////////////////////////////////////////////////////
-						int keyNo_G_ = myStack.size()-2;
+
 						double** likeli;
 						likeli = new double*[keyNo_G_];
 						for (int l=0; l<keyNo_G_; l++)
@@ -108,9 +105,9 @@ int CI_match::run(int galleryKeyFrameNo[], State galleryState[][MaxCombine],
 						{
 							for (int n=0; n<keyNo_P; n++)
 							{
-								int galleryIndex = myStack[m+1];
+								int galleryIndex = myStack[m+1]-1;
 								likeli[m][n] = states_similar(galleryState[w][galleryIndex], probeState[n],postureMatrix);
-								//cout<<likeli[m][n]<<'\t';
+								//cout<<galleryIndex<<" "<<galleryState[w][galleryIndex].B<<'\t';
 							}
 							//cout<<endl;
 						}
@@ -120,22 +117,30 @@ int CI_match::run(int galleryKeyFrameNo[], State galleryState[][MaxCombine],
 						p1.x = keyNo_G_-1;
 						p1.y = keyNo_P-1;
 						double myMaxSimilar = maxSimilar(p0,p1,likeli);
-						for (int l=0; l<keyNo_G_-1; l++)
+// 						for (int l=0; l<keyNo_G_-1; l++)
+// 						{
+// 							int pre = myStack[l];
+// 							int cur = myStack[l+1];
+// 							if (cur < keyNo_G+1)
+// 							{
+// 								myMaxSimilar *= (galleryTranfer[w][pre][cur] * galleryState[w][cur].frequency);
+// 							}
+// 							else if (cur == keyNo_G+1)
+// 							{
+// 								myMaxSimilar *= galleryTranfer[w][pre][cur];
+// 							}
+// 
+// 							
+// 						}
+							//To sum them or to choose the maximum is a problem.
+						//myMaxSimilar /= 2*(keyNo_G_+0.000001);
+						myMaxSimilar = pow(myMaxSimilar,(double)(1.0/(keyNo_G_+0.000001)));
+						//wordScore[w] += myMaxSimilar;//sum them. 
+						if (myMaxSimilar > wordScore[w])
 						{
-							int pre = myStack[l];
-							int cur = myStack[l+1];
-							if (cur < keyNo_G+1)
-							{
-								myMaxSimilar *= (galleryTranfer[w][pre][cur] * galleryState[w][cur].frequency);
-							}
-							else if (cur == keyNo_G+1)
-							{
-								myMaxSimilar *= galleryTranfer[w][pre][cur];
-							}
-
-							
+							wordScore[w] = myMaxSimilar;
 						}
-						wordScore[w] += myMaxSimilar;//sum them.
+
 						//cout<<"word: "<<w<<"myMaxSimilar: "<<myMaxSimilar<<endl;
 						for (int l=0; l<keyNo_G_; l++)
 						{
@@ -182,8 +187,8 @@ int CI_match::run(int galleryKeyFrameNo[], State galleryState[][MaxCombine],
 			maxWordLabel = w;
 		}
 	}
-	cout<<"maxWordLabel: "<<maxWordLabel<<endl;
-	return 0;
+	//cout<<"maxWordScore: "<<maxWordScore<<endl;
+	return maxWordLabel;
 }
 
 

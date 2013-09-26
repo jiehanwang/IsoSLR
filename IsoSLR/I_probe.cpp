@@ -485,7 +485,7 @@ int CI_probe::generateProbeStateFromDat(int classNum[],float postureC[][maxClass
 {
 	//Label the posture.
 	cout<<"Label the posture..."<<endl;
-	for (int i=0; i<GalleryNum; i++)
+	for (int i=0; i<1/*GalleryNum*/; i++)
 	{
 		cout<<"Sample: "<<i<<endl;
 		labelPosture(HOG_LRB[i], label[i], classNum, ikeyFrameNo[i], indicator[i], postureC);
@@ -493,7 +493,7 @@ int CI_probe::generateProbeStateFromDat(int classNum[],float postureC[][maxClass
 
 	//Generate the state. Memory "myState[GalleryNum][Word_num][MaxKeyNo]". 
 	cout<<"Generate the state..."<<endl;
-	for (int g=0; g<GalleryNum; g++)
+	for (int g=0; g<1/*GalleryNum*/; g++)
 	{
 		for (int w=0; w<Word_num; w++)
 		{
