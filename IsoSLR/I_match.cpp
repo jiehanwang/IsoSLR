@@ -111,12 +111,14 @@ int CI_match::run(int galleryKeyFrameNo[], State galleryState[][MaxCombine],
 							}
 							//cout<<endl;
 						}
+							//
 						CvPoint p0, p1;
 						p0.x = 0;
 						p0.y = 0;
 						p1.x = keyNo_G_-1;
 						p1.y = keyNo_P-1;
 						double myMaxSimilar = maxSimilar(p0,p1,likeli);
+							//Probability is added here. 
 // 						for (int l=0; l<keyNo_G_-1; l++)
 // 						{
 // 							int pre = myStack[l];
@@ -134,7 +136,9 @@ int CI_match::run(int galleryKeyFrameNo[], State galleryState[][MaxCombine],
 // 						}
 							//To sum them or to choose the maximum is a problem.
 						//myMaxSimilar /= 2*(keyNo_G_+0.000001);
-						myMaxSimilar = pow(myMaxSimilar,(double)(1.0/(keyNo_G_+0.000001)));
+// 						cout<<"sqrt: "<<myMaxSimilar<<" "<<keyNo_G_<<" ";
+// 						myMaxSimilar = pow(myMaxSimilar,(double)(1.0/(keyNo_G_+0.000001)));
+// 						cout<<myMaxSimilar<<endl;
 						//wordScore[w] += myMaxSimilar;//sum them. 
 						if (myMaxSimilar > wordScore[w])
 						{
@@ -173,7 +177,7 @@ int CI_match::run(int galleryKeyFrameNo[], State galleryState[][MaxCombine],
 
 		delete[] posi;
 
-		//cout<<"word: "<<w<<"mySimilar: "<<wordScore[w]<<endl;
+		//cout<<"word: "<<w<<"S:-----"<<wordScore[w]<<endl;
 	}
 
 
@@ -196,14 +200,14 @@ double CI_match::maxSimilar(CvPoint p0, CvPoint p1, double** likeli)
 {
 	if (p0.x == p1.x && p0.y == p1.y)
 	{
-		if (likeli[p0.x][p0.y] == 0)
-		{
-			return 1;
-		}
-		else
-		{
+// 		if (likeli[p0.x][p0.y] == 0)
+// 		{
+// 			return 1;
+// 		}
+// 		else
+// 		{
 			return likeli[p0.x][p0.y];
-		}
+//		}
 		
 	}
 	else
@@ -222,6 +226,7 @@ double CI_match::maxSimilar(CvPoint p0, CvPoint p1, double** likeli)
 				}
 			}
 		}
+		
 		CvPoint maxPPre;
 		CvPoint maxPLat;
 		maxPPre.x = maxP.x-1 > p0.x ? maxP.x-1 : p0.x; 
@@ -232,9 +237,14 @@ double CI_match::maxSimilar(CvPoint p0, CvPoint p1, double** likeli)
 // 		cout<<maxPPre.x<<'\t'<<maxPPre.y<<endl;
 // 		cout<<maxPLat.x<<'\t'<<maxPLat.y<<endl;
 // 		cout<<endl;
-
-		return maxV * maxSimilar(p0,maxPPre,likeli) * maxSimilar(maxPLat,p1,likeli);
+		if (maxV > 0.0)
+		{
+			return maxV * maxSimilar(p0,maxPPre,likeli) * maxSimilar(maxPLat,p1,likeli);
+		}
+		else
+		{
+			return maxSimilar(p0,maxPPre,likeli) * maxSimilar(maxPLat,p1,likeli);
+		}
+		
 	}
-
-	return 0;
 }

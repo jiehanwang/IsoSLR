@@ -44,35 +44,39 @@ int _tmain(int argc, _TCHAR* argv[])
 	
 	int correctSum = 0;
 	//float correctP = 0.0;
-	for (int w=0; w<Word_num; w++)
-	//int w=117;
+	for (int g=0; g<GalleryNum; g++)
 	{
-		if (myProbe.ikeyFrameNo[0][w] > 0)
+		correctSum = 0;
+		for (int w=0; w<Word_num; w++)
 		{
-			for (int i=0; i<myProbe.ikeyFrameNo[0][w]; i++)
+			if (myProbe.ikeyFrameNo[g][w] > 0)
 			{
-				State stateTemp = myProbe.myState[0][w][i];
-				myState.push_back(stateTemp);
+				for (int i=0; i<myProbe.ikeyFrameNo[g][w]; i++)
+				{
+					State stateTemp = myProbe.myState[g][w][i];
+					myState.push_back(stateTemp);
+				}
+
+				int classNo = myMatch.run(myGallery.keyFrameNo, myGallery.myState, myGallery.tranfer,
+					myGallery.postureMatrix, myState);
+
+				//cout<<"WordID: "<<w<<" ClassNo: "<<classNo<<endl;
+				if (w == classNo)
+				{
+					correctSum += 1;
+				}
+			}
+			else
+			{
+				//cout<<"No probe!"<<endl;
 			}
 
-			int classNo = myMatch.run(myGallery.keyFrameNo, myGallery.myState, myGallery.tranfer,
-				myGallery.postureMatrix, myState);
 
-			cout<<"WordID: "<<w<<" ClassNo: "<<classNo<<endl;
-			if (w == classNo)
-			{
-				correctSum += 1;
-			}
+			myState.clear();
 		}
-		else
-		{
-			cout<<"No probe!"<<endl;
-		}
-		
-		
-		myState.clear();
+		cout<<"correct rate: "<<(float)correctSum/Word_num<<endl;
 	}
-	cout<<"correct rate: "<<(float)correctSum/Word_num<<endl;
+	
 
 //It is the code generate state from videos.
 /*	Readvideo myReadVideo;
