@@ -38,49 +38,62 @@ int _tmain(int argc, _TCHAR* argv[])
 	CString route = "..\\input";
 	myGallery.readGallery(route);
 
+#ifdef readProbeFromDat
 	//Read in the Probe.
 	myProbe.ReadDataFromGallery(route);
 	myProbe.generateProbeStateFromDat(myGallery.classNum, myGallery.postureC);
-	
+	myMatch.readInMask("..\\input\\fMask_Yushun.txt");
+
 	int correctSum = 0;
 	//float correctP = 0.0;
-	for (int g=0; g<GalleryNum; g++)
+	//for (int g=0; g<GalleryNum; g++)
+	int count = 0;
+	int g = testGallery;
 	{
 		correctSum = 0;
 		for (int w=0; w<Word_num; w++)
 		{
-			if (myProbe.ikeyFrameNo[g][w] > 0)
+			//if (myMatch.testFlag[w] == 1)
 			{
-				for (int i=0; i<myProbe.ikeyFrameNo[g][w]; i++)
+				count++;
+				myMatch.initial(w);
+				if (myProbe.ikeyFrameNo[g][w] > 0)
 				{
-					State stateTemp = myProbe.myState[g][w][i];
-					myState.push_back(stateTemp);
+					for (int i=0; i<myProbe.ikeyFrameNo[g][w]; i++)
+					{
+						State stateTemp = myProbe.myState[g][w][i];
+						myState.push_back(stateTemp);
+					}
+
+					int classNo = myMatch.run(myGallery.keyFrameNo, myGallery.myState, myGallery.tranfer,
+						myGallery.postureMatrix, myState);
+
+					cout<<"WordID: "<<w<<" ClassNo: "<<classNo<<endl;
+					if (w == classNo)
+					{
+						correctSum += 1;
+					}
+				}
+				else
+				{
+					cout<<"No probe!"<<endl;
 				}
 
-				int classNo = myMatch.run(myGallery.keyFrameNo, myGallery.myState, myGallery.tranfer,
-					myGallery.postureMatrix, myState);
 
-				//cout<<"WordID: "<<w<<" ClassNo: "<<classNo<<endl;
-				if (w == classNo)
-				{
-					correctSum += 1;
-				}
+				myState.clear();
+				myMatch.release();
 			}
-			else
-			{
-				//cout<<"No probe!"<<endl;
-			}
-
-
-			myState.clear();
+			
 		}
-		cout<<"correct rate: "<<(float)correctSum/Word_num<<endl;
+		cout<<"correct rate: "<<(float)correctSum/count<<endl;
 	}
-	
+#endif
 
+
+#ifndef readProbeFromDat
 //It is the code generate state from videos.
-/*	Readvideo myReadVideo;
-	int sentenceIndex = 3;
+	Readvideo myReadVideo;
+	int sentenceIndex = 2;
 	CString         videoFileName;
 	if (sentenceIndex<10)
 	{
@@ -172,16 +185,17 @@ int _tmain(int argc, _TCHAR* argv[])
 		cout<<myState[i].l<<" "<<myState[i].r<<" "<<myState[i].b<<" "<<myState[i].L<<" "<<myState[i].R<<" "<<myState[i].B<<endl;
 	}
 
-// 	int classNo = myMatch.run(myGallery.keyFrameNo, myGallery.myState, myGallery.tranfer,
-// 		myGallery.postureMatrix, myState);
-	 
+ 	int classNo = myMatch.run(myGallery.keyFrameNo, myGallery.myState, myGallery.tranfer,
+ 		myGallery.postureMatrix, myState);
+	cout<<"WordID: "<<sentenceIndex<<" ClassNo: "<<classNo<<endl;
+
 	myKeyframe.setGetDataOver(true);
 	while(!myKeyframe.getSegmentOver());
 	myKeyframe.releaseMemory();
 	
 	cvReleaseImage(&frameCurrent);
+#endif
 
-*/
 	cout<<"done"<<endl;
 	getchar();
 	return 0;

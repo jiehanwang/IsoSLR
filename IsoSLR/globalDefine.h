@@ -1,23 +1,29 @@
 #pragma once
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <vector>
+#include <atlstr.h>
+#include <direct.h>
 #include <list>
 #include <map>
 #include <hash_map>
 //#include <cv.h>
 #include <opencv2\opencv.hpp>
 using namespace std;
+#define testGallery 4
+#define Word_num 370
+#define MaxCombine 100
+#define maxClassNum 500
+#define LRB 3
+#define HOG_dimension 324
+#define readProbeFromDat
+#define EP 0.00001
 
 #define ZHIHAOPC
 //#define CURVE2D
 #define CURVE3D
 
-#define Word_num 370
-#define MaxCombine 100
-#define maxClassNum 100
-#define LRB 3
-#define HOG_dimension 324
 
 struct State
 {
