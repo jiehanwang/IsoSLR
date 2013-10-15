@@ -327,6 +327,7 @@ void CI_probe::postureClassification(int classNum[], float postureC[][maxClassNu
 	
 	delete[] tempFeature;
 }
+
 void CI_probe::saveFrames(int folderIndex, IplImage* image, int lrb, int frameIndexStart, int frameIndexEnd)
 {
 	int i,j,k;
@@ -339,7 +340,7 @@ void CI_probe::saveFrames(int folderIndex, IplImage* image, int lrb, int frameIn
 	cvSaveImage(s_ImgFileName, image);
 }
 
-void CI_probe::ReadDataFromGallery(CString route)
+void CI_probe::ReadshapeDataFromGallery(CString route)
 {
 	int i, j, k, galleryIndex, m;
 	int* Label_sequence;     //Original label sequence.
@@ -500,15 +501,26 @@ int CI_probe::generateProbeStateFromDat(int classNum[],float postureC[][maxClass
 		for (int w=0; w<Word_num; w++)
 		{
 			//cout<<ikeyFrameNo[g][w]<<endl;
-			stateGenerate(ikeyFrameNo[g][w],label[g][w],indicator[g][w],myState[g][w]);
+			stateGenerate(ikeyFrameNo[g][w],label[g][w],indicator[g][w],myState[g][w],myTra[g][w]);
 		}
 	}
 
 	return 0;
 }
 
-void CI_probe::stateGenerate(int keyFrameNo, int label[][LRB],int indicator[][LRB], State myState[])
+void CI_probe::stateGenerate(int keyFrameNo, int label[][LRB],int indicator[][LRB], State myState[], Tra myTra)
 {
+// 	for (int i=0; i<keyFrameNo; i++)
+// 	{
+// 		myState[i].l = indicator[i][0];
+// 		myState[i].r = indicator[i][1];
+// 		myState[i].b = indicator[i][2];
+// 
+// 		myState[i].L = label[i][0];
+// 		myState[i].R = label[i][1];
+// 		myState[i].B = label[i][2];
+// 	}
+	//cout<<"keyFrameNo: "<<keyFrameNo<<" myTra: "<<myTra.segNum<<endl;
 	for (int i=0; i<keyFrameNo; i++)
 	{
 		myState[i].l = indicator[i][0];
@@ -518,5 +530,230 @@ void CI_probe::stateGenerate(int keyFrameNo, int label[][LRB],int indicator[][LR
 		myState[i].L = label[i][0];
 		myState[i].R = label[i][1];
 		myState[i].B = label[i][2];
+
+		myState[i].Head.x = myTra.hx;
+		myState[i].Head.y = myTra.hy;
+		myState[i].Head.z = myTra.hz;
+
+		//const int traNumDes = 200;
+		CvPoint3D32f leftHand[traNumDes];
+		CvPoint3D32f righHand[traNumDes];
+		int traNumsrc = myTra.frameNum;
+
+		traNormalize(myTra, traNumDes, leftHand, righHand);
+
+		for (int j=0; j<traNumDes; j++)
+		{
+			//cout<<j<<" "<<leftHand[j].x<<" "<<leftHand[j].y<<" "<<leftHand[j].z<<", "
+			//<<righHand[j].x<<" "<<righHand[j].y<<" "<<righHand[j].z<<endl;
+			myState[i].TL.push_back(leftHand[j]);
+			myState[i].TR.push_back(righHand[j]);
+		}
+
 	}
+}
+
+void CI_probe::ReadTrajectoryFromDat(CString route, Tra myTra[])
+{
+	//////////////////////////////////////////////////////////////////////////
+	//Read the head position
+	int* headPosition;
+	int headPosition_size = Word_num*3; //3 is for the x,y,z ordinate.
+	headPosition = new int[headPosition_size];
+	ifstream infile_headPosition;
+	infile_headPosition.open(route+"\\HeadPosition.dat",ios::binary);
+	infile_headPosition.read((char*)headPosition, headPosition_size*sizeof(int));//将Gallery_Label中的数据读到数组Label_sequence1中
+	infile_headPosition.close();
+
+	for (int i=0;i<Word_num; i++)
+	{
+		//cout<<"ID: "<<i<<*(headPosition + 3*i)<<" "<<*(headPosition + 3*i+1)<<" "<<*(headPosition + 3*i+2)<<endl;
+		myTra[i].exist = 1;
+		myTra[i].hx = *(headPosition + 3*i + 0);
+		myTra[i].hy = *(headPosition + 3*i + 1);
+		myTra[i].hz = *(headPosition + 3*i + 2);
+	}
+	delete[] headPosition;
+	//////////////////////////////////////////////////////////////////////////
+	//Read the label
+	int* label;
+	int label_size = Word_num * 20;   //At most 20 key frames in each sign.
+	label = new int[label_size];
+	ifstream infile_label;
+	infile_label.open(route+"\\LabelForTra.dat",ios::binary);
+	infile_label.read((char*)label,label_size*sizeof(int));
+
+	int pointer_label = 0;
+	for (int w=0; w<Word_num; w++)
+	{
+		myTra[w].signID = *(label + pointer_label + 0);
+		myTra[w].frameNum = *(label + pointer_label + 1);
+		myTra[w].segNum = *(label + pointer_label + 2);
+
+		//cout<<myTra[w].signID<<" "<<myTra[w].frameNum<<" "<<myTra[w].segNum<<endl;
+		for (int s=0; s<myTra[w].segNum; s++)
+		{
+			int frameID = *(label + pointer_label + 3 + s);
+			myTra[w].segFrameID.push_back(frameID);
+			//cout<<frameID<<" ";
+		}
+		//cout<<endl;
+		pointer_label += 3+myTra[w].segNum;
+	}
+	delete[] label;
+	//////////////////////////////////////////////////////////////////////////
+	//Read the hand positions
+	int* trajectory;
+	int trajectory_size = Word_num * 6 * 500; //At most 500 frames average for each sign. 
+	trajectory = new int[trajectory_size];
+	ifstream infile_trajectory;
+	infile_trajectory.open(route+"\\Trajectory.dat",ios::binary);
+	infile_trajectory.read((char*)trajectory,trajectory_size*sizeof(int));
+
+	int pointer_tra = 0;
+	for (int w=0; w<Word_num; w++)
+	{
+		for (int s=0; s<myTra[w].frameNum; s++)
+		{
+			int lx = *(trajectory + pointer_tra + 0);
+			int ly = *(trajectory + pointer_tra + 1);
+			int lz = *(trajectory + pointer_tra + 2);
+			int rx = *(trajectory + pointer_tra + 3);
+			int ry = *(trajectory + pointer_tra + 4);
+			int rz = *(trajectory + pointer_tra + 5);
+
+			myTra[w].lx.push_back(lx);
+			myTra[w].ly.push_back(ly);
+			myTra[w].lz.push_back(lz);
+			myTra[w].rx.push_back(rx);
+			myTra[w].ry.push_back(ry);
+			myTra[w].rz.push_back(rz);
+
+			pointer_tra += 6;
+		}
+	}
+
+	delete[] trajectory;
+}
+
+void CI_probe::ReadProbeGallery(void)
+{
+	CString root;
+	for (int g=0; g<5; g++)
+	{
+		cout<<"Read trajectory data P5"<<g<<"..."<<endl;
+		root.Format("..\\input\\20130925\\trajectory\\P5%d",g);
+		ReadTrajectoryFromDat(root, myTra[g]);
+	}
+
+	cout<<"Read shape data..."<<endl;
+	root="..\\input\\20130925";
+	ReadshapeDataFromGallery(root);
+}
+
+void CI_probe::ReSample(float x[],float y[],float z[],int n,int m)//n: srcNodeNum. m: desNodeNum
+{
+	const int F = 512;
+	double len=0.0;
+	double D=0.0;
+	double d=0.0;
+	int k=1;
+	float pointx[F];
+	float pointy[F];
+	float pointz[F];
+	for (int i=0;i<n;i++)
+	{
+		pointx[i]=x[i];
+		pointy[i]=y[i];
+		pointz[i]=z[i];
+	}
+
+	for (int j=1;j<n;j++)
+	{
+		len+=sqrt((pointx[j]-pointx[j-1])*(pointx[j]-pointx[j-1])+(pointy[j]-pointy[j-1])*(pointy[j]-pointy[j-1])+(pointz[j]-pointz[j-1])*(pointz[j]-pointz[j-1]));	
+	}
+	double I=len/(m-1);
+
+	if (/*I==0*/I<0.001)
+	{
+		for (int k=0;k<m;k++)
+		{
+			x[k]=pointx[0];
+			y[k]=pointy[0];
+			z[k]=pointz[0];
+		}
+	}
+	else
+	{
+		for (int i=1;i<n;i++)
+		{
+			d=sqrt((pointx[i]-pointx[i-1])*(pointx[i]-pointx[i-1])+(pointy[i]-pointy[i-1])*(pointy[i]-pointy[i-1])+(pointz[i]-pointz[i-1])*(pointz[i]-pointz[i-1]));
+			if(D+d>=I)
+			{
+				if (d!=0)//事实上，由于I!=0,d在这里不会等于0
+				{
+					x[k]=pointx[i-1]+((I-D)/d)*(pointx[i]-pointx[i-1]);
+					y[k]=pointy[i-1]+((I-D)/d)*(pointy[i]-pointy[i-1]);
+					z[k]=pointz[i-1]+((I-D)/d)*(pointz[i]-pointz[i-1]);
+				}
+				else//此时I==0，无需计算（之前对I==0的情况已经计算过了）
+				{
+					break;
+				}
+				pointx[i-1]=x[k];
+				pointy[i-1]=y[k];
+				pointz[i-1]=z[k];
+
+				k++;
+				i=i-1;
+				D=0.0;
+			}
+			else
+			{
+				D=D+d;
+			}
+		}
+	}
+
+	//由于舍入的原因，D+d>=I的等号不能确保最后一个点被记录，因此要特地记录下来
+	x[m-1]=pointx[n-1];
+	y[m-1]=pointy[n-1];
+	z[m-1]=pointz[n-1];
+}
+
+void CI_probe::traNormalize(Tra myTra, int nodeNumDes, CvPoint3D32f left[], CvPoint3D32f right[])
+{
+	int nodeNumSrc = myTra.frameNum;
+	const int F = 512;
+	float l_x[F];
+	float l_y[F];
+	float l_z[F];
+
+	float r_x[F];
+	float r_y[F];
+	float r_z[F];
+
+	for (int i=0; i<nodeNumSrc; i++)
+	{
+		l_x[i] = (float)myTra.lx[i];
+		l_y[i] = (float)myTra.ly[i];
+		l_z[i] = (float)myTra.lz[i];
+		r_x[i] = (float)myTra.rx[i];
+		r_y[i] = (float)myTra.ry[i];
+		r_z[i] = (float)myTra.rz[i];
+	}
+	ReSample(l_x, l_y, l_z, nodeNumSrc, nodeNumDes);
+	ReSample(r_x, r_y, r_z, nodeNumSrc, nodeNumDes);
+
+	for (int i=0; i<nodeNumDes; i++)
+	{
+		left[i].x = l_x[i];
+		left[i].y = l_y[i];
+		left[i].z = l_z[i];
+
+		right[i].x = r_x[i];
+		right[i].y = r_y[i];
+		right[i].z = r_z[i];
+	}
+
 }

@@ -11,7 +11,7 @@
 //#include <cv.h>
 #include <opencv2\opencv.hpp>
 using namespace std;
-#define testGallery 4
+#define testGallery 2
 #define Word_num 370
 #define MaxCombine 100
 #define maxClassNum 500
@@ -19,12 +19,27 @@ using namespace std;
 #define HOG_dimension 324
 #define readProbeFromDat
 #define EP 0.00001
+const int traNumDes = 200;
 
 #define ZHIHAOPC
 //#define CURVE2D
 #define CURVE3D
 
 
+// struct State
+// {
+// 	int r;             //Indicator
+// 	int l;
+// 	int b;
+// 	int R;             //Hand posture label
+// 	int L;
+// 	int B;
+// 	CvPoint3D32f PL;   //Hand position
+// 	CvPoint3D32f PR;  
+// 	int TL;            //Hand trajectory label
+// 	int TR;
+// 	double frequency;  //Frequency of this state in the combined gallery.
+// };
 struct State
 {
 	int r;             //Indicator
@@ -35,11 +50,13 @@ struct State
 	int B;
 	CvPoint3D32f PL;   //Hand position
 	CvPoint3D32f PR;  
-	int TL;            //Hand trajectory label
-	int TR;
+	CvPoint3D32f Head;  //For hand trajectory label
+	vector<CvPoint3D32f> TL;            
+	vector<CvPoint3D32f> TR;
 	double frequency;  //Frequency of this state in the combined gallery.
+	// 	int previous;      //-1 is the start.
+	// 	int next;          //-2 is the end. 
 };
-
 
 //////////////////////////////////////////////////////////////////////////
 struct HandSegment

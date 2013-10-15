@@ -7,6 +7,23 @@
 #include <fstream>
 #define GalleryNum 5
 #define MaxKeyNo 25
+struct Tra
+{
+	bool exist;
+	int signID;
+	int frameNum;
+	int hx;   //For head
+	int hy;
+	int hz;
+	int segNum;
+	vector<int> segFrameID;
+	vector<int> lx; //For left hand
+	vector<int> ly;
+	vector<int> lz;
+	vector<int> rx; //For right hand
+	vector<int> ry;
+	vector<int> rz;
+};
 struct Std
 {
 	IplImage * pic_route;//Pointer to the key frame sequence.
@@ -35,6 +52,8 @@ public:
 	vector<double> HOG_LRB[GalleryNum][Word_num][LRB][MaxKeyNo];    //HOG label for each key frame, 3 channels.
 	int            indicator[GalleryNum][Word_num][MaxKeyNo][LRB];//Indicate whether left, right, both images are existing. 
 	int            label[GalleryNum][Word_num][MaxKeyNo][LRB];    //L, R, B's class label in each state.
+
+	Tra            myTra[GalleryNum][Word_num];
 	//State
 	int            ikeyFrameNo[GalleryNum][Word_num];     //All the three channels have the same key frame number.
 	State          myState[GalleryNum][Word_num][MaxKeyNo];         //This is the state before gallery generating.  
@@ -54,7 +73,7 @@ public:
 	int bestFrame(vector<Std> choose_pic);
 	void postureClassification(int classNum[], float postureC[][maxClassNum][HOG_dimension]);
 	void saveFrames(int folderIndex, IplImage* image, int lrb, int frameIndexStart, int frameIndexEnd);
-	void ReadDataFromGallery(CString route);
+	void ReadshapeDataFromGallery(CString route);
 	void labelPosture(                                      //To get the "label" in this function
 		vector<double> HOG_LRB[][LRB][MaxKeyNo], 
 		int            label[][MaxKeyNo][LRB],
@@ -64,6 +83,10 @@ public:
 		float          postureC[][maxClassNum][HOG_dimension]);
 	double Histogram_minD(vector<double>vec1,vector<double>vec2);
 	int generateProbeStateFromDat(int classNum[],float postureC[][maxClassNum][HOG_dimension]);
-	void stateGenerate(int keyFrameNo, int label[][LRB],int indicator[][LRB], State myState[]);
+	void stateGenerate(int keyFrameNo, int label[][LRB],int indicator[][LRB], State myState[], Tra myTra);
+	void ReadTrajectoryFromDat(CString route, Tra myTra[]);
+	void ReadProbeGallery(void);
+	void ReSample(float x[],float y[],float z[],int n,int m);
+	void traNormalize(Tra myTra, int nodeNumDes, CvPoint3D32f left[], CvPoint3D32f right[]);
 };
 

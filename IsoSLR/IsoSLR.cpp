@@ -40,7 +40,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 #ifdef readProbeFromDat
 	//Read in the Probe.
-	myProbe.ReadDataFromGallery(route);
+	myProbe.ReadProbeGallery();
 	myProbe.generateProbeStateFromDat(myGallery.classNum, myGallery.postureC);
 	myMatch.readInMask("..\\input\\fMask_Yushun.txt");
 

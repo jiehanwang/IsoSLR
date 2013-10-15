@@ -102,8 +102,9 @@ void CI_galleryCreate::galleryReadFromDat(CString route)
 		totalKeyFrame += keyFrameNo[w];
 	}
 	//////////////////////////////////////////////////////////////////////////
+	int length = 16 + 6*traNumDes;
 	float* state_sequence;
-	int stateSize = totalKeyFrame*15;
+	int stateSize = totalKeyFrame*length;
 	state_sequence = new float[stateSize];
 
 	ifstream infileState;
@@ -118,11 +119,11 @@ void CI_galleryCreate::galleryReadFromDat(CString route)
 		{
 			if (w==0)
 			{
-				location = (0 + m)*15;
+				location = (0 + m)*length;
 			}
 			else
 			{
-				location = (*(keyFrame_sequence_locate + w - 1) + m)*15;
+				location = (*(keyFrame_sequence_locate + w - 1) + m)*length;
 			}
 			
 			myState[w][m].r = (int)(*(state_sequence + location + 0));
@@ -137,9 +138,32 @@ void CI_galleryCreate::galleryReadFromDat(CString route)
 			myState[w][m].PR.x = (float)(*(state_sequence + location + 9));
 			myState[w][m].PR.y = (float)(*(state_sequence + location + 10));
 			myState[w][m].PR.z = (float)(*(state_sequence + location + 11));
-			myState[w][m].TL = (int)(*(state_sequence + location + 12));
-			myState[w][m].TR = (int)(*(state_sequence + location + 13));
-			myState[w][m].frequency = (double)(*(state_sequence + location + 14));
+			myState[w][m].Head.x = (float)(*(state_sequence + location + 12));
+			myState[w][m].Head.y = (float)(*(state_sequence + location + 13));
+			myState[w][m].Head.z = (float)(*(state_sequence + location + 14));
+
+			for (int i=0; i<traNumDes; i++)
+			{
+				CvPoint3D32f leftHand;
+				CvPoint3D32f rightHand;
+				leftHand.x = (float)(*(state_sequence + location + 15 + i*6 + 0));
+				leftHand.y = (float)(*(state_sequence + location + 15 + i*6 + 1));
+				leftHand.z = (float)(*(state_sequence + location + 15 + i*6 + 2));
+				rightHand.x = (float)(*(state_sequence + location + 15 + i*6 + 3));
+				rightHand.y = (float)(*(state_sequence + location + 15 + i*6 + 4));
+				rightHand.z = (float)(*(state_sequence + location + 15 + i*6 + 5));
+				myState[w][m].TL.push_back(leftHand);
+				myState[w][m].TR.push_back(rightHand);
+				//cout<<i<<endl;
+				//cout<<myState[w][m].TL[i].x<<" "<<myState[w][m].TL[i].y<<" "<<myState[w][m].TL[i].z<<endl;
+				//cout<<myState[w][m].TR[i].x<<" "<<myState[w][m].TR[i].y<<" "<<myState[w][m].TR[i].z<<endl;
+
+			}
+
+			//myState[w][m].TL = (int)(*(state_sequence + location + 12));
+			//myState[w][m].TR = (int)(*(state_sequence + location + 13));
+			myState[w][m].frequency = (double)(*(state_sequence + location + 15 + traNumDes*6));
+			//cout<<myState[w][m].frequency<<endl;
 
 		}
 	}
