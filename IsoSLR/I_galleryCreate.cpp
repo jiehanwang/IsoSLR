@@ -142,6 +142,7 @@ void CI_galleryCreate::galleryReadFromDat(CString route)
 			myState[w][m].Head.y = (float)(*(state_sequence + location + 13));
 			myState[w][m].Head.z = (float)(*(state_sequence + location + 14));
 
+#ifdef useTra
 			for (int i=0; i<traNumDes; i++)
 			{
 				CvPoint3D32f leftHand;
@@ -159,7 +160,7 @@ void CI_galleryCreate::galleryReadFromDat(CString route)
 				//cout<<myState[w][m].TR[i].x<<" "<<myState[w][m].TR[i].y<<" "<<myState[w][m].TR[i].z<<endl;
 
 			}
-
+#endif
 			//myState[w][m].TL = (int)(*(state_sequence + location + 12));
 			//myState[w][m].TR = (int)(*(state_sequence + location + 13));
 			myState[w][m].frequency = (double)(*(state_sequence + location + 15 + traNumDes*6));

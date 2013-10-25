@@ -1,5 +1,6 @@
 #pragma once
 #include "globalDefine.h"
+#include "S_TrajectoryRecognition.h"
 #include <algorithm>
 using namespace std;
 

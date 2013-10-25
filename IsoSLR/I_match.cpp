@@ -20,15 +20,47 @@ double CI_match::states_similar(State myState1, State myState2,
 		&& myState1.r == myState2.r
 		&& myState1.b == myState2.b)
 	{
+		float disRe = 1.0; 
+		int left1 = myState1.L<myState2.L?myState1.L:myState2.L;
+		int left2 = myState1.L>myState2.L?myState1.L:myState2.L;
+
+		int right1 = myState1.R<myState2.R?myState1.R:myState2.R;
+		int right2 = myState1.R>myState2.R?myState1.R:myState2.R;
+#ifdef useTra
+		CvPoint3D32f head1;
+		CvPoint3D32f head2;
+		vector<CvPoint3D32f> leftHand1;
+		vector<CvPoint3D32f> leftHand2;
+		vector<CvPoint3D32f> rightHand1;
+		vector<CvPoint3D32f> rightHand2;
+
+		head1.x = myState1.Head.x;
+		head1.y = myState1.Head.y;
+		head1.z = myState1.Head.z;
+
+		head2.x = myState2.Head.x;
+		head2.y = myState2.Head.y;
+		head2.z = myState2.Head.z;
+
+		for (int i=0; i<traNumDes; i++)
+		{
+			CvPoint3D32f leftTemp1 = myState1.TL[i];
+			CvPoint3D32f rightTemp1 = myState1.TR[i];
+			CvPoint3D32f leftTemp2 = myState2.TL[i];
+			CvPoint3D32f rightTemp2 = myState2.TR[i];
+			leftHand1.push_back(leftTemp1);
+			rightHand1.push_back(rightTemp1);
+			leftHand2.push_back(leftTemp2);
+			rightHand2.push_back(rightTemp2);
+		}
+		disRe = Sentence_match(head1,leftHand1,rightHand1,head2,leftHand2,rightHand2);
+		disRe = 1/pow(2.7183,0.07*disRe);
+#endif
 		//if ()   //Position is used here.
 		{
 			if(myState1.l == 1 && myState1.r == 1)
 			{
-				int left1 = myState1.L<myState2.L?myState1.L:myState2.L;
-				int left2 = myState1.L>myState2.L?myState1.L:myState2.L;
-
-				int right1 = myState1.R<myState2.R?myState1.R:myState2.R;
-				int right2 = myState1.R>myState2.R?myState1.R:myState2.R;
+				
 
 				similarity = sqrt(postureMatrix[0][left1][left2]*postureMatrix[1][right1][right2]);
 			}
@@ -51,6 +83,8 @@ double CI_match::states_similar(State myState1, State myState2,
 				similarity = postureMatrix[2][both1][both2];
 			}
 		}
+
+		similarity *= disRe;
 	}
 
 

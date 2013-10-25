@@ -536,6 +536,7 @@ void CI_probe::stateGenerate(int keyFrameNo, int label[][LRB],int indicator[][LR
 		myState[i].Head.z = myTra.hz;
 
 		//const int traNumDes = 200;
+#ifdef useTra
 		CvPoint3D32f leftHand[traNumDes];
 		CvPoint3D32f righHand[traNumDes];
 		int traNumsrc = myTra.frameNum;
@@ -549,6 +550,7 @@ void CI_probe::stateGenerate(int keyFrameNo, int label[][LRB],int indicator[][LR
 			myState[i].TL.push_back(leftHand[j]);
 			myState[i].TR.push_back(righHand[j]);
 		}
+#endif
 
 	}
 }

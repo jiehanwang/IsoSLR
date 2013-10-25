@@ -8,10 +8,10 @@
 #include <list>
 #include <map>
 #include <hash_map>
-//#include <cv.h>
 #include <opencv2\opencv.hpp>
 using namespace std;
-#define testGallery 2
+//#define useTra
+#define testGallery 4
 #define Word_num 370
 #define MaxCombine 100
 #define maxClassNum 500
@@ -25,21 +25,6 @@ const int traNumDes = 200;
 //#define CURVE2D
 #define CURVE3D
 
-
-// struct State
-// {
-// 	int r;             //Indicator
-// 	int l;
-// 	int b;
-// 	int R;             //Hand posture label
-// 	int L;
-// 	int B;
-// 	CvPoint3D32f PL;   //Hand position
-// 	CvPoint3D32f PR;  
-// 	int TL;            //Hand trajectory label
-// 	int TR;
-// 	double frequency;  //Frequency of this state in the combined gallery.
-// };
 struct State
 {
 	int r;             //Indicator
@@ -57,7 +42,19 @@ struct State
 	// 	int previous;      //-1 is the start.
 	// 	int next;          //-2 is the end. 
 };
-
+//////////////////////////////////////////////////////////////////////////
+const int K = 15; ///K for KNN
+#define MaxKeyPostureNum 10
+#define Posture_num_add 384
+#define Theda  0.0000001
+const int num=5;
+const int dim=3;//3D
+const int WordsNum=370;
+const int probenum=0;
+const double PI= 3.1415;
+const double eps=0.0001;
+const int F=1500;
+const int rsnum=1000;
 //////////////////////////////////////////////////////////////////////////
 struct HandSegment
 {
