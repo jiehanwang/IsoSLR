@@ -644,12 +644,12 @@ void CI_probe::ReadProbeGallery(void)
 	for (int g=0; g<5; g++)
 	{
 		cout<<"Read trajectory data P5"<<g<<"..."<<endl;
-		root.Format("..\\input\\20130925\\trajectory\\P5%d",g);
+		root.Format("..\\input\\20131019\\trajectory\\P1%d",g);
 		ReadTrajectoryFromDat(root, myTra[g]);
 	}
 
 	cout<<"Read shape data..."<<endl;
-	root="..\\input\\20130925";
+	root="..\\input\\20131019";
 	ReadshapeDataFromGallery(root);
 }
 

@@ -11,10 +11,10 @@
 #include <opencv2\opencv.hpp>
 using namespace std;
 //#define useTra
-#define testGallery 4
-#define Word_num 370
+#define testGallery 2
+#define Word_num 1000//370
 #define MaxCombine 100
-#define maxClassNum 500
+#define maxClassNum 2000
 #define LRB 3
 #define HOG_dimension 324
 #define readProbeFromDat
